@@ -7,6 +7,7 @@ import ClaimsPieChart from "./components/ClaimsPieChart";
 import CasesTable from "./components/CasesTable";
 import CaseDetailsModal from "./components/CaseDetailsModal";
 import CreateCaseForm from "./components/CreateCaseForm";
+import AiCaseAssistant from "./components/AiCaseAssistant";
 
 export default function DashboardPage() {
   const [selectedCase, setSelectedCase] = useState(null);
@@ -14,6 +15,21 @@ export default function DashboardPage() {
     { id: "C-101", name: "Auto Claim - Tesla", createdAt: "2025-09-01", updatedAt: "2025-09-03" },
     { id: "C-102", name: "Home Insurance - Fire", createdAt: "2025-09-05", updatedAt: "2025-09-06" },
   ]);
+
+  const mockCases = [
+  {
+    id: "CA-201",
+    name: "Travel Insurance Claim - Missed Connection at JFK",
+    description: "Flight missed due to delay",
+    status: "Pending",
+  },
+  {
+    id: "CA-202",
+    name: "Auto Collision Claim - Rear-End at Mission Bay",
+    description: "Minor damages reported",
+    status: "Approved",
+  },
+  ];
 
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
@@ -47,6 +63,10 @@ export default function DashboardPage() {
         {/* Row 4: Create New Case Form */}
         <div>
           <CreateCaseForm onSubmit={handleAddCase} />
+        </div>
+        {/* Row 5: AI Case Assistant */}
+        <div>
+          <AiCaseAssistant initialCases={mockCases} />
         </div>
       </div>
 
