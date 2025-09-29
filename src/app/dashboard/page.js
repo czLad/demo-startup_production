@@ -7,7 +7,7 @@ import ClaimsPieChart from "./components/ClaimsPieChart";
 import CasesTable from "./components/CasesTable";
 import CaseDetailsModal from "./components/CaseDetailsModal";
 import CreateCaseForm from "./components/CreateCaseForm";
-import AiCaseAssistant from "./components/AiCaseAssistant";
+import AICaseAssistant from "./components/AICaseAssistant";
 
 export default function DashboardPage() {
   const [selectedCase, setSelectedCase] = useState(null);
@@ -16,7 +16,7 @@ export default function DashboardPage() {
     { id: "C-102", name: "Home Insurance - Fire", createdAt: "2025-09-05", updatedAt: "2025-09-06" },
   ]);
 
-  const mockCases = [
+  const [mockCases, setMockCases] = useState([
   {
     id: "CA-201",
     name: "Travel Insurance Claim - Missed Connection at JFK",
@@ -29,7 +29,7 @@ export default function DashboardPage() {
     description: "Minor damages reported",
     status: "Approved",
   },
-  ];
+  ]);
 
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
@@ -37,6 +37,26 @@ export default function DashboardPage() {
     setCases([
       ...cases,
       { id: newId, name: newCase.caseName, createdAt: now, updatedAt: now },
+    ]);
+  };
+
+  const handleAddAICase = (data) => {
+    if (!data.success) return;
+    const now = new Date().toISOString().split("T")[0];
+
+    setMockCases([
+      ...mockCases,
+      {
+        id: data.new_case_id,                       // ✅ backend UUID
+        name: data.result?.reasoning || "New Case",
+        description: `Confidence: ${data.result?.confidence ?? "N/A"}`,
+        status: data.result?.decision || "N/A",
+        createdAt: now,
+        updatedAt: now,
+        analysis: data.result?.ai_analysis,
+        confidence: data.result?.confidence_score,
+        processingTime: data.result?.processing_time,
+      },
     ]);
   };
 
@@ -62,11 +82,11 @@ export default function DashboardPage() {
 
         {/* Row 4: Create New Case Form */}
         <div>
-          <CreateCaseForm onSubmit={handleAddCase} />
+          <CreateCaseForm onSubmit={handleAddAICase} />
         </div>
         {/* Row 5: AI Case Assistant */}
         <div>
-          <AiCaseAssistant initialCases={mockCases} />
+          <AICaseAssistant cases={mockCases} />
         </div>
       </div>
 

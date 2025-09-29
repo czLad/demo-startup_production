@@ -4,8 +4,8 @@
 import { useState } from "react";
 import { Edit, Trash2, Play, PlayCircle, RefreshCcw } from "lucide-react";
 
-export default function AiCaseAssistant({ initialCases = [] }) {
-  const [cases, setCases] = useState(initialCases);
+export default function AICaseAssistant({ cases = [] }) {
+
   const [selected, setSelected] = useState([]);
 
   const toggleSelect = (id) => {

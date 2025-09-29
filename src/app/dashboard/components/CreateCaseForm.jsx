@@ -2,22 +2,33 @@
 "use client";
 
 import { useState } from "react";
+import { createCaseWithAI } from "@/app/service/createService";
 
 export default function CreateCaseForm({ onSubmit }) {
   const [tenantId, setTenantId] = useState("");
   const [caseName, setCaseName] = useState("");
   const [file, setFile] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newCase = { tenantId, caseName, file };
-    onSubmit?.(newCase);
-
-    // reset form
-    setTenantId("");
-    setCaseName("");
-    setFile(null);
+    try {
+      const data = await createCaseWithAI({ tenantId, caseName, file });
+      // Will uncomment on next dev hour
+      // console.log(data)
+      if (data.success) {
+        onSubmit?.(data);
+        setTenantId("");
+        setCaseName("");
+        setFile(null);
+      } else {
+        alert("Case creation failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
   };
+
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border">
