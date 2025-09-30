@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "./components/DashboardLayout";
 import StatCard from "./components/StatCard";
 import ClaimsPieChart from "./components/ClaimsPieChart";
@@ -8,6 +8,7 @@ import CasesTable from "./components/CasesTable";
 import CaseDetailsModal from "./components/CaseDetailsModal";
 import CreateCaseForm from "./components/CreateCaseForm";
 import AICaseAssistant from "./components/AICaseAssistant";
+import { getAllTenants } from "../service/fetchService";
 
 export default function DashboardPage() {
   const [selectedCase, setSelectedCase] = useState(null);
@@ -31,6 +32,30 @@ export default function DashboardPage() {
   },
   ]);
 
+  const [tenants, setTenants] = useState([]);
+  const [tenantMap, setTenantMap] = useState({});
+
+  useEffect( () => {
+    const fetchTenants = async () => {
+      const data = await getAllTenants();
+      // console.log(data)
+      if(data.success) {
+        setTenants(data.result);
+        setTenantMap(
+          Object.fromEntries(data.result.map((t) => [t.name, t.id]))
+        );
+      }
+      else {
+        console.error("Failed to fetch tenants", data.error);
+      }
+    }
+    fetchTenants();
+  }, []);
+
+  // console.log("Rendering tenants:", tenants);
+
+  // console.log("Rendering tenantmaps:", tenantMap);
+
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
     const now = new Date().toISOString().split("T")[0];
@@ -41,6 +66,7 @@ export default function DashboardPage() {
   };
 
   const handleAddAICase = (data) => {
+    console.log(data)
     if (!data.success) return;
     const now = new Date().toISOString().split("T")[0];
 
@@ -48,7 +74,7 @@ export default function DashboardPage() {
       ...mockCases,
       {
         id: data.new_case_id,                       // ✅ backend UUID
-        name: data.result?.reasoning || "New Case",
+        name: data.result?.name || "New Case",
         description: `Confidence: ${data.result?.confidence ?? "N/A"}`,
         status: data.result?.decision || "N/A",
         createdAt: now,
