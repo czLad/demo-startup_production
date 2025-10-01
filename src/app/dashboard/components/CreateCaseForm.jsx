@@ -4,10 +4,14 @@
 import { useState } from "react";
 import { createCaseWithAI } from "@/app/service/createService";
 
-export default function CreateCaseForm({ onSubmit }) {
-  const [tenantId, setTenantId] = useState("");
+export default function CreateCaseForm({ onSubmit, tenants, tenantMap }) {
+
+  const [tenantName, setTenantName] = useState("");
   const [caseName, setCaseName] = useState("");
   const [file, setFile] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [error, setError] = useState("");
+  const [highlightIndex, setHighlightIndex] = useState(-1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,6 +33,9 @@ export default function CreateCaseForm({ onSubmit }) {
     }
   };
 
+  const filteredTenants = tenants.filter((t) =>
+    t.name.toLowerCase().includes(tenantName.toLowerCase())
+  );
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border">
@@ -36,20 +43,87 @@ export default function CreateCaseForm({ onSubmit }) {
         Create Case
       </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Tenant ID */}
-        <div>
+        {/* Tenant Autocomplete */}
+        <div className="relative">
           <label className="block text-xs font-medium text-gray-600 mb-1">
-            Tenant ID
+            Tenant
           </label>
           <input
             type="text"
-            value={tenantId}
-            onChange={(e) => setTenantId(e.target.value)}
-            placeholder="Enter tenant ID"
-            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring focus:ring-blue-200"
+            value={tenantName}
+            onChange={(e) => {
+              setTenantName(e.target.value);
+              setShowSuggestions(true);
+              setError("");
+              setHighlightIndex(-1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setHighlightIndex((prev) =>
+                  prev < filteredTenants.length - 1 ? prev + 1 : 0
+                );
+              }
+              if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setHighlightIndex((prev) =>
+                  prev > 0 ? prev - 1 : filteredTenants.length - 1
+                );
+              }
+              if (e.key === "Enter" && highlightIndex >= 0) {
+                e.preventDefault();
+                setTenantName(filteredTenants[highlightIndex].name);
+                setShowSuggestions(false);
+                setError("");
+              }
+            }}
+            onBlur={() => {
+              setTimeout(() => setShowSuggestions(false), 100);
+              if (tenantName) {
+                const match = tenants.find(
+                  (t) => t.name.toLowerCase() === tenantName.toLowerCase()
+                );
+                if (match) {
+                  setTenantName(match.name); // normalize casing
+                  setError("");
+                } else {
+                  setError("Please select a valid tenant from the list.");
+                }
+              }
+            }}
+            onFocus={() => setShowSuggestions(true)}
+            placeholder="Start typing tenant name"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring focus:ring-blue-200 ${
+              error ? "border-red-500" : ""
+            }`}
             required
           />
+          {/* Suggestions Dropdown */}
+          {showSuggestions && filteredTenants.length > 0 && (
+            <ul className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-40 overflow-y-auto">
+              {filteredTenants.map((t, index) => (
+                <li
+                  key={t.id}
+                  onMouseDown={() => {
+                    setTenantName(t.name);
+                    setShowSuggestions(false);
+                    setError("");
+                  }}
+                  className={`px-3 py-2 cursor-pointer text-sm ${
+                    index === highlightIndex
+                      ? "bg-blue-100"
+                      : "hover:bg-blue-50"
+                  }`}
+                >
+                  {t.name}
+                </li>
+              ))}
+            </ul>
+          )}
+          {/* Inline Error */}
+          {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
         </div>
+
 
         {/* Case Name */}
         <div>

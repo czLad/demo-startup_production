@@ -108,7 +108,7 @@ export default function DashboardPage() {
 
         {/* Row 4: Create New Case Form */}
         <div>
-          <CreateCaseForm onSubmit={handleAddAICase} />
+          <CreateCaseForm onSubmit={handleAddAICase} tenants={tenants} tenantMap={tenantMap}/>
         </div>
         {/* Row 5: AI Case Assistant */}
         <div>
