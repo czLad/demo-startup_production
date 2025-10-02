@@ -1,4 +1,4 @@
-export async function GET(request) {
+export async function GET() {
   try {
 
     const response = await fetch(`${process.env.BASE_URL}/tenant/`, {

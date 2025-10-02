@@ -8,7 +8,7 @@ import CasesTable from "./components/CasesTable";
 import CaseDetailsModal from "./components/CaseDetailsModal";
 import CreateCaseForm from "./components/CreateCaseForm";
 import AICaseAssistant from "./components/AICaseAssistant";
-import { getAllTenants } from "../service/fetchService";
+import { getAllTenants, getTenantCases } from "../service/fetchService";
 
 export default function DashboardPage() {
   const [selectedCase, setSelectedCase] = useState(null);
@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [tenants, setTenants] = useState([]);
   const [tenantMap, setTenantMap] = useState({});
 
+  //Not gonna need all tenants when login gets implemented
   useEffect( () => {
     const fetchTenants = async () => {
       const data = await getAllTenants();
@@ -52,9 +53,38 @@ export default function DashboardPage() {
     fetchTenants();
   }, []);
 
+
   // console.log("Rendering tenants:", tenants);
 
   // console.log("Rendering tenantmaps:", tenantMap);
+
+  //Hardcoded for now -> To be soft coded with login implemented
+  const tenantID = tenantMap["alliant"]
+
+  // Add a route to get all cases for tenant: alliant
+  useEffect(() => {
+    if(!tenantID) return;
+    const fetchTenantCases = async () => {
+      const data = await getTenantCases(tenantID)
+      if(data.success){
+        const normalized = data.result.map((c) => ({
+          id: c.id,
+          name: c.case_name || "Untitled Case",   // map backend `case_name` -> `name`
+          description: "Minor damages reported",                        // backend doesn’t give one yet
+          status: "Pending",                      // default/fallback since backend doesn’t send status
+          createdAt: c.created_at,
+          updatedAt: c.updated_at,
+        }));
+        setMockCases(normalized);
+      }
+      else{
+        console.error("Failed to fetch tenant cases", data.error); //Ask Jack to put in error field
+      }
+    }
+    fetchTenantCases()
+  }, [tenantID])
+
+  // console.log(mockCases)
 
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
