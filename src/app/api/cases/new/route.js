@@ -7,6 +7,7 @@ export async function POST(request) {
       method: "POST",
       body: formData,
       headers: {
+        // "Content-Type" : 'application/json',
         "x-api-key": process.env.SYNSURE_PUBLIC_KEY,
       },
     });

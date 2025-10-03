@@ -70,7 +70,7 @@ export default function DashboardPage() {
         const normalized = data.result.map((c) => ({
           id: c.id,
           name: c.case_name || "Untitled Case",   // map backend `case_name` -> `name`
-          description: "Minor damages reported",                        // backend doesn’t give one yet
+          description: c.short_des,          // "Minor damages reported",              // backend doesn’t give one yet
           status: "Pending",                      // default/fallback since backend doesn’t send status
           createdAt: c.created_at,
           updatedAt: c.updated_at,
@@ -96,22 +96,19 @@ export default function DashboardPage() {
   };
 
   const handleAddAICase = (data) => {
-    console.log(data)
+    // console.log(data)
     if (!data.success) return;
     const now = new Date().toISOString().split("T")[0];
 
     setMockCases([
       ...mockCases,
       {
-        id: data.new_case_id,                       // ✅ backend UUID
-        name: data.result?.name || "New Case",
-        description: `Confidence: ${data.result?.confidence ?? "N/A"}`,
-        status: data.result?.decision || "N/A",
-        createdAt: now,
-        updatedAt: now,
-        analysis: data.result?.ai_analysis,
-        confidence: data.result?.confidence_score,
-        processingTime: data.result?.processing_time,
+        id: data.new_case_id,
+        name: data.result.case_name || "Untitled Case",   // map backend `case_name` -> `name`
+        description: data.result.short_des,          // "Minor damages reported",              // backend doesn’t give one yet
+        status: "Pending",                      // default/fallback since backend doesn’t send status
+        createdAt: data.result.created_at,
+        updatedAt: data.result.updated_at,
       },
     ]);
   };
@@ -138,7 +135,7 @@ export default function DashboardPage() {
 
         {/* Row 4: Create New Case Form */}
         <div>
-          <CreateCaseForm onSubmit={handleAddAICase} tenants={tenants} tenantMap={tenantMap}/>
+          <CreateCaseForm onSubmit={handleAddAICase} tenants={tenants} tenantID={tenantID}/>
         </div>
         {/* Row 5: AI Case Assistant */}
         <div>

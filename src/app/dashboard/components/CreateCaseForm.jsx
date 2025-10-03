@@ -4,10 +4,11 @@
 import { useState } from "react";
 import { createCaseWithAI } from "@/app/service/createService";
 
-export default function CreateCaseForm({ onSubmit, tenants, tenantMap }) {
+export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
 
   const [tenantName, setTenantName] = useState("");
   const [caseName, setCaseName] = useState("");
+  const [caseType, setCaseType] = useState("");
   const [file, setFile] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [error, setError] = useState("");
@@ -16,12 +17,18 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantMap }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const data = await createCaseWithAI({ tenantId, caseName, file });
+      const data = await createCaseWithAI({ tenantID, caseName, caseType, file });
       // Will uncomment on next dev hour
       // console.log(data)
       if (data.success) {
-        onSubmit?.(data);
-        setTenantId("");
+        const mergedData = {
+          ...data,
+          result: {
+            ...data.result,
+            case_name: caseName
+          }
+        }
+        onSubmit?.(mergedData);
         setCaseName("");
         setFile(null);
       } else {
@@ -135,6 +142,20 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantMap }) {
             value={caseName}
             onChange={(e) => setCaseName(e.target.value)}
             placeholder="Enter case name"
+            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring focus:ring-blue-200"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Case Type
+          </label>
+          <input
+            type="text"
+            value={caseType}
+            onChange={(e) => setCaseType(e.target.value)}
+            placeholder="Enter case type"
             className="w-full px-3 py-2 border rounded-lg text-sm focus:ring focus:ring-blue-200"
             required
           />
