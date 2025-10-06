@@ -13,9 +13,11 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [error, setError] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true)
     try {
       const data = await createCaseWithAI({ tenantID, caseName, caseType, file });
       // Will uncomment on next dev hour
@@ -37,6 +39,8 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
+    } finally {
+      setIsLoading(false); // ✅ Stop loading
     }
   };
 
@@ -45,11 +49,18 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
   );
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border">
+    <div className="relative bg-white p-6 rounded-xl shadow-sm border overflow-hidden">
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+          <p className="text-sm font-medium text-gray-600">Creating Case...</p>
+        </div>
+      )}
+      
       <h3 className="text-sm font-medium text-gray-600 mb-4">
         Create Case
       </h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className={`space-y-4 transition duration-200 ${isLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
         {/* Tenant Autocomplete */}
         <div className="relative">
           <label className="block text-xs font-medium text-gray-600 mb-1">

@@ -17,23 +17,25 @@ export default function DashboardPage() {
     { id: "C-102", name: "Home Insurance - Fire", createdAt: "2025-09-05", updatedAt: "2025-09-06" },
   ]);
 
-  const [mockCases, setMockCases] = useState([
-  {
-    id: "CA-201",
-    name: "Travel Insurance Claim - Missed Connection at JFK",
-    description: "Flight missed due to delay",
-    status: "Pending",
-  },
-  {
-    id: "CA-202",
-    name: "Auto Collision Claim - Rear-End at Mission Bay",
-    description: "Minor damages reported",
-    status: "Approved",
-  },
-  ]);
+  // const [mockCases, setMockCases] = useState([
+  // {
+  //   id: "CA-201",
+  //   name: "Travel Insurance Claim - Missed Connection at JFK",
+  //   description: "Flight missed due to delay",
+  //   status: "Pending",
+  // },
+  // {
+  //   id: "CA-202",
+  //   name: "Auto Collision Claim - Rear-End at Mission Bay",
+  //   description: "Minor damages reported",
+  //   status: "Approved",
+  // },
+  // ]);
+  const [mockCases, setMockCases] = useState([]);
 
   const [tenants, setTenants] = useState([]);
   const [tenantMap, setTenantMap] = useState({});
+  const [isLoadingTenantCases, setIsLoadingTenantCases] = useState(true);
 
   //Not gonna need all tenants when login gets implemented
   useEffect( () => {
@@ -65,20 +67,26 @@ export default function DashboardPage() {
   useEffect(() => {
     if(!tenantID) return;
     const fetchTenantCases = async () => {
-      const data = await getTenantCases(tenantID)
-      if(data.success){
+      setIsLoadingTenantCases(true)
+      try {
+      const data = await getTenantCases(tenantID);
+      if (data.success) {
         const normalized = data.result.map((c) => ({
           id: c.id,
-          name: c.case_name || "Untitled Case",   // map backend `case_name` -> `name`
-          description: c.short_des,          // "Minor damages reported",              // backend doesn’t give one yet
-          status: "Pending",                      // default/fallback since backend doesn’t send status
+          name: c.case_name || "Untitled Case",
+          description: c.short_des,
+          status: "Ready for Review",
           createdAt: c.created_at,
           updatedAt: c.updated_at,
         }));
         setMockCases(normalized);
+      } else {
+        console.error("Failed to fetch tenant cases", data.error);
       }
-      else{
-        console.error("Failed to fetch tenant cases", data.error); //Ask Jack to put in error field
+      } catch (error) {
+        console.error("Error fetching tenant cases:", error);
+      } finally {
+        setIsLoadingTenantCases(false); // ✅ Always stop loading
       }
     }
     fetchTenantCases()
@@ -106,7 +114,7 @@ export default function DashboardPage() {
         id: data.new_case_id,
         name: data.result.case_name || "Untitled Case",   // map backend `case_name` -> `name`
         description: data.result.short_des,          // "Minor damages reported",              // backend doesn’t give one yet
-        status: "Pending",                      // default/fallback since backend doesn’t send status
+        status: "Case Created",                      // default/fallback since backend doesn’t send status
         createdAt: data.result.created_at,
         updatedAt: data.result.updated_at,
       },
@@ -139,7 +147,7 @@ export default function DashboardPage() {
         </div>
         {/* Row 5: AI Case Assistant */}
         <div>
-          <AICaseAssistant cases={mockCases} />
+          <AICaseAssistant tenantID={tenantID} cases={mockCases} setCases={setMockCases} isLoadingCases={isLoadingTenantCases}/>
         </div>
       </div>
 
