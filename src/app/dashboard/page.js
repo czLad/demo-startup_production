@@ -8,14 +8,17 @@ import CasesTable from "./components/CasesTable";
 import CaseDetailsModal from "./components/CaseDetailsModal";
 import CreateCaseForm from "./components/CreateCaseForm";
 import AICaseAssistant from "./components/AICaseAssistant";
+import CaseAnalysisModal from "./components/CaseAnalysisModal";
 import { getAllTenants, getTenantCases } from "../service/fetchService";
 
 export default function DashboardPage() {
   const [selectedCase, setSelectedCase] = useState(null);
-  const [cases, setCases] = useState([
-    { id: "C-101", name: "Auto Claim - Tesla", createdAt: "2025-09-01", updatedAt: "2025-09-03" },
-    { id: "C-102", name: "Home Insurance - Fire", createdAt: "2025-09-05", updatedAt: "2025-09-06" },
-  ]);
+  const [selectedCaseAI, setSelectedCaseAI] = useState(null);
+  const [analysisData, setAnalysisData] = useState(null);
+    const [cases, setCases] = useState([
+      { id: "C-101", name: "Auto Claim - Tesla", createdAt: "2025-09-01", updatedAt: "2025-09-03" },
+      { id: "C-102", name: "Home Insurance - Fire", createdAt: "2025-09-05", updatedAt: "2025-09-06" },
+    ]);
 
   // const [mockCases, setMockCases] = useState([
   // {
@@ -86,7 +89,7 @@ export default function DashboardPage() {
       } catch (error) {
         console.error("Error fetching tenant cases:", error);
       } finally {
-        setIsLoadingTenantCases(false); // ✅ Always stop loading
+        setIsLoadingTenantCases(false); // Always stop loading
       }
     }
     fetchTenantCases()
@@ -121,6 +124,22 @@ export default function DashboardPage() {
     ]);
   };
 
+  const exampleResponse = {
+  "confidence": 76,
+  "short_des": "Missed connection—extra airfare and hotel night",
+  "reasoning": "ClaimForm_Travel (CASE-004-TRAVEL) and OrbitFly itinerary confirm an interrupted trip due to a delayed connection with rebooking and one night lodging requested, but receipts and carrier delay confirmation are not yet provided, so conditions precedent to payment are incomplete. Under Chubb Travel Insurance Trip Interruption/Delay, coverage applies for common-carrier delay when the insured furnishes proof of loss (receipts, carrier documentation) and demonstrates reasonable, necessary expenses; handling must align with fair-claims standards, and potential third-party recovery from the carrier (e.g., EU261 if applicable) should be considered.",
+  "riskScore": "MEDIUM",
+  "flags": ["DOCUMENTATION_INCONSISTENT", "COVERAGE_ADEQUATE", "THIRD_PARTY_LIABILITY"],
+  "rule_followed": "false",
+  "rule_used": "Chubb Travel Insurance Policy—Trip Interruption/Trip Delay: Duties After Loss (proof of loss, receipts, carrier delay confirmation)#California Fair Claims Settlement Practices Regulations, 10 CCR §2695.7#NAIC Unfair Claims Settlement Practices Model Act (claims documentation and investigation standards)#Regulation (EC) No 261/2004 (EU261) (air passenger delay compensation; potential third-party recovery)"
+  }
+
+  const handleCaseClick = (caseData) => {
+    setAnalysisData(exampleResponse); // replace with selected case’s AI result
+    setSelectedCaseAI(caseData.id);
+  };
+
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -130,10 +149,28 @@ export default function DashboardPage() {
         </div>
 
         {/* Row 2: Stat Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <StatCard title="Active Claims" value="70%" status="Completion" color="bg-blue-100 text-blue-600" />
-          <StatCard title="Denied" value="32" color="bg-red-100 text-red-600" />
-          <StatCard title="Approved" value="54" color="bg-green-100 text-green-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatCard
+            title="Active Claims"
+            value="30%"
+            status="In Progress"
+            color="blue"
+            trend={{ value: "+3%", direction: "up" }}
+          />
+          <StatCard
+            title="Denied"
+            value="32"
+            status="Declined"
+            color="red"
+            trend={{ value: "-2%", direction: "down" }}
+          />
+          <StatCard
+            title="Approved"
+            value="54"
+            status="Completed"
+            color="green"
+            trend={{ value: "+8%", direction: "up" }}
+          />
         </div>
 
         {/* Row 3: Cases Table */}
@@ -147,7 +184,7 @@ export default function DashboardPage() {
         </div>
         {/* Row 5: AI Case Assistant */}
         <div>
-          <AICaseAssistant tenantID={tenantID} cases={mockCases} setCases={setMockCases} isLoadingCases={isLoadingTenantCases}/>
+          <AICaseAssistant tenantID={tenantID} cases={mockCases} setCases={setMockCases} isLoadingCases={isLoadingTenantCases} onCaseClick={handleCaseClick}/>
         </div>
       </div>
 
@@ -156,6 +193,13 @@ export default function DashboardPage() {
         isOpen={!!selectedCase}
         caseData={selectedCase}
         onClose={() => setSelectedCase(null)}
+      />
+
+      {/* Case Analysis Modal */}
+      <CaseAnalysisModal
+        isOpen={!!selectedCaseAI}
+        onClose={() => setSelectedCaseAI(null)}
+        data={analysisData}
       />
     </DashboardLayout>
   );
