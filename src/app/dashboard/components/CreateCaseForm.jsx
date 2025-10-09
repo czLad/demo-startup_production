@@ -215,6 +215,8 @@
 //   );
 // }
 
+"use client";
+
 import { useState } from "react";
 import { createCaseWithAI } from "@/app/service/createService";
 
@@ -222,7 +224,7 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
   const [tenantName, setTenantName] = useState("");
   const [caseName, setCaseName] = useState("");
   const [caseType, setCaseType] = useState("");
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]); // ✅ now supports multiple files
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [error, setError] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
@@ -232,7 +234,13 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const data = await createCaseWithAI({ tenantID, caseName, caseType, file });
+      const data = await createCaseWithAI({
+        tenantID,
+        caseName,
+        caseType,
+        files, // ✅ pass as array
+      });
+
       if (data.success) {
         const mergedData = {
           ...data,
@@ -240,7 +248,7 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
         };
         onSubmit?.(mergedData);
         setCaseName("");
-        setFile(null);
+        setFiles([]);
       } else alert("Case creation failed");
     } catch (err) {
       console.error(err);
@@ -253,6 +261,15 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
   const filteredTenants = tenants.filter((t) =>
     t.name.toLowerCase().includes(tenantName.toLowerCase())
   );
+
+  const handleFileChange = (e) => {
+    const selected = Array.from(e.target.files);
+    setFiles(selected);
+  };
+
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="relative bg-white p-6 rounded-2xl shadow-md transition-all duration-300 hover:shadow-lg">
@@ -275,7 +292,7 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
           isLoading ? "opacity-50 pointer-events-none" : "opacity-100"
         }`}
       >
-        {/* Tenant Input */}
+        {/* Tenant Autocomplete (unchanged) */}
         <div className="relative">
           <label className="block text-xs font-medium text-gray-500 mb-1">
             Tenant
@@ -384,32 +401,48 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
           />
         </div>
 
-        {/* File Upload */}
+        {/* File Upload (multiple) */}
         <div>
           <label className="block text-xs font-medium text-gray-500 mb-1">
-            Attach File (optional)
+            Attach Files (optional)
           </label>
           <input
             type="file"
             id="file-upload"
             className="hidden"
-            onChange={(e) => setFile(e.target.files[0])}
+            multiple
+            onChange={handleFileChange}
           />
           <label
             htmlFor="file-upload"
             className="inline-block cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition"
           >
-            Choose File
+            Choose Files
           </label>
-          {file && (
-            <div className="mt-2 flex items-center space-x-2 text-sm text-gray-600">
-              <span className="text-gray-500">📎</span>
-              <span>{file.name}</span>
-            </div>
+
+          {/* File preview */}
+          {files.length > 0 && (
+            <ul className="mt-3 space-y-1 text-sm text-gray-700">
+              {files.map((f, i) => (
+                <li
+                  key={i}
+                  className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg border border-gray-100"
+                >
+                  <span className="truncate w-3/4">{f.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeFile(i)}
+                    className="text-red-500 hover:text-red-700 text-xs font-medium"
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           type="submit"
           className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"

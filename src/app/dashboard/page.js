@@ -175,7 +175,7 @@ export default function DashboardPage() {
 
         {/* Row 3: Cases Table */}
         <div>
-          <CasesTable cases={cases} onCaseClick={setSelectedCase} />
+          <CasesTable cases={mockCases} onCaseClick={setSelectedCase} />
         </div>
 
         {/* Row 4: Create New Case Form */}

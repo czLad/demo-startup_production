@@ -207,6 +207,7 @@
 import { useState } from "react";
 import { Edit, Trash2, Play, PlayCircle } from "lucide-react";
 import { submitBatch, getTaskStatus } from "@/app/service/batchService";
+import { deleteCase } from "@/app/service/deleteService"; // ✅ new import
 
 export default function AICaseAssistant({
   tenantID,
@@ -286,6 +287,20 @@ export default function AICaseAssistant({
       }
     }, 5000);
   };
+
+  const handleDelete = async (e, caseID, caseName) => {
+    e.stopPropagation(); // prevent opening modal
+    if (!confirm(`Are you sure you want to delete case ${caseName}?`)) return;
+
+  const res = await deleteCase(tenantID, caseID);
+    if (res.success) {
+      setCases((prev) => prev.filter((x) => x.id !== caseID));
+      alert("Case deleted successfully.");
+    } else {
+      alert("Failed to delete case.");
+      console.error(res.error);
+    }
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-md relative overflow-hidden">
@@ -402,6 +417,7 @@ export default function AICaseAssistant({
                   <Edit className="w-4 h-4" />
                 </button>
                 <button
+                  onClick={(e) => handleDelete(e, c.id, c.name)}
                   className="text-red-600 hover:text-red-700"
                   title="Delete"
                 >
