@@ -36,13 +36,13 @@ export default function InsightsModal({ isOpen, onClose, category, data }) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 bg-blue-600 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-            <h2 className="text-lg font-semibold text-white tracking-wide">
+          <div className="flex items-center justify-between px-6 py-4 bg-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+            <h2 className="text-lg font-semibold text-black tracking-wide">
               Insights — {category}
             </h2>
             <button
               onClick={onClose}
-              className="text-blue-100 hover:text-white transition transform hover:scale-105"
+              className="text-black-100 hover:text-blue-600 transition transform hover:scale-110"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />

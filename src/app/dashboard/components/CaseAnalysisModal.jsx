@@ -48,13 +48,21 @@ export default function CaseAnalysisModal({ isOpen, onClose, data }) {
           onClick={(e) => e.stopPropagation()} // prevent inner clicks from closing
         >
           {/* Header */}
-          <div className="relative flex items-center justify-between px-5 sm:px-6 py-4 bg-gradient-to-r from-blue-700 to-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
-            <h2 className="text-base sm:text-lg font-semibold text-white tracking-wide">
+          {/* <div className="relative flex items-center justify-between px-5 sm:px-6 py-4 bg-gradient-to-r from-blue-700 to-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.2)]"> */}
+        {/* <div className="relative flex items-center justify-between px-5 sm:px-6 py-4 bg-gradient-to-r from-gray-100 to-gray-50 shadow-[0_4px_12px_rgba(0,0,0,0.2)]"> */}
+          {/* <div className="relative flex items-center justify-between px-5 sm:px-6 py-4 bg-blue-500 shadow-[0_4px_12px_rgba(0,0,0,0.2)]">  */}
+            {/* <h2 className="text-base sm:text-lg font-semibold text-white tracking-wide"> */}
+        <div className="relative flex items-center justify-between px-5 sm:px-6 py-4 bg-gradient-to-r from-blue-50 to-white shadow-[0_4px_12px_rgba(0,0,0,0.2)]">    
+            <h2 className="text-base sm:text-lg font-semibold text-black tracking-wide">
               Case Analysis
             </h2>
-            <button
+            {/* <button
               onClick={onClose}
               className="text-blue-100 hover:text-white transition transform hover:scale-105"
+            > */}
+            <button
+              onClick={onClose}
+              className="text-black-100 hover:text-blue-600 transition transform hover:scale-110"
             >
               <X className="w-5 h-5" />
             </button>
