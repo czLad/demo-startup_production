@@ -1,46 +1,48 @@
 // // src/app/components/CreateCaseForm.jsx
 "use client";
 
-// import { useState } from "react";
+// import { useState, useRef } from "react";
 // import { createCaseWithAI } from "@/app/service/createService";
 
 // export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
-
 //   const [tenantName, setTenantName] = useState("");
 //   const [caseName, setCaseName] = useState("");
 //   const [caseType, setCaseType] = useState("");
-//   const [file, setFile] = useState(null);
+//   const [files, setFiles] = useState([]); // ✅ now supports multiple files
 //   const [showSuggestions, setShowSuggestions] = useState(false);
 //   const [error, setError] = useState("");
 //   const [highlightIndex, setHighlightIndex] = useState(-1);
 //   const [isLoading, setIsLoading] = useState(false);
+//   const fileInputRef = useRef(null);
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
-//     setIsLoading(true)
+//     setIsLoading(true);
 //     try {
-//       const data = await createCaseWithAI({ tenantID, caseName, caseType, file });
-//       // Will uncomment on next dev hour
-//       // console.log(data)
+//       const data = await createCaseWithAI({
+//         tenantID,
+//         caseName,
+//         caseType,
+//         files, // ✅ pass as array
+//       });
+//       console.log(data)
+
 //       if (data.success) {
 //         const mergedData = {
 //           ...data,
-//           result: {
-//             ...data.result,
-//             case_name: caseName
-//           }
-//         }
+//           result: { ...data.result, case_name: caseName },
+//         };
 //         onSubmit?.(mergedData);
 //         setCaseName("");
-//         setFile(null);
-//       } else {
-//         alert("Case creation failed");
-//       }
+//         setFiles([]);
+
+//         if (fileInputRef.current) fileInputRef.current.value = "";
+//       } else alert("Case creation failed");
 //     } catch (err) {
 //       console.error(err);
 //       alert("Something went wrong");
 //     } finally {
-//       setIsLoading(false); // ✅ Stop loading
+//       setIsLoading(false);
 //     }
 //   };
 
@@ -48,25 +50,47 @@
 //     t.name.toLowerCase().includes(tenantName.toLowerCase())
 //   );
 
+//   const handleFileChange = (e) => {
+//     const selected = Array.from(e.target.files);
+//     setFiles(selected);
+//   };
+
+//   const removeFile = (index) => {
+//     setFiles((prev) => prev.filter((_, i) => i !== index));
+
+//     if (fileInputRef.current && files.length <= 1) {
+//       fileInputRef.current.value = "";
+//     }
+//   };
+
 //   return (
-//     <div className="relative bg-white p-6 rounded-xl shadow-sm border overflow-hidden">
+//     <div className="relative bg-white p-6 rounded-2xl shadow-md transition-all duration-300 hover:shadow-lg">
+//       {/* Loading Overlay */}
 //       {isLoading && (
-//         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+//         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-2xl">
 //           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
 //           <p className="text-sm font-medium text-gray-600">Creating Case...</p>
 //         </div>
 //       )}
 
-//       <h3 className="text-sm font-medium text-gray-600 mb-4">
+//       {/* Header */}
+//       <h3 className="text-lg font-semibold text-gray-800 mb-4">
 //         Create Case
 //       </h3>
-//       <form onSubmit={handleSubmit} className={`space-y-4 transition duration-200 ${isLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
-//         {/* Tenant Autocomplete */}
+
+//       <form
+//         onSubmit={handleSubmit}
+//         className={`space-y-4 transition duration-200 ${
+//           isLoading ? "opacity-50 pointer-events-none" : "opacity-100"
+//         }`}
+//       >
+//         {/* Tenant Autocomplete (unchanged) */}
 //         <div className="relative">
-//           <label className="block text-xs font-medium text-gray-600 mb-1">
+//           <label className="block text-xs font-medium text-gray-500 mb-1">
 //             Tenant
 //           </label>
 //           <input
+//             ref={fileInputRef}
 //             type="text"
 //             value={tenantName}
 //             onChange={(e) => {
@@ -102,7 +126,7 @@
 //                   (t) => t.name.toLowerCase() === tenantName.toLowerCase()
 //                 );
 //                 if (match) {
-//                   setTenantName(match.name); // normalize casing
+//                   setTenantName(match.name);
 //                   setError("");
 //                 } else {
 //                   setError("Please select a valid tenant from the list.");
@@ -111,14 +135,13 @@
 //             }}
 //             onFocus={() => setShowSuggestions(true)}
 //             placeholder="Start typing tenant name"
-//             className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring focus:ring-blue-200 ${
-//               error ? "border-red-500" : ""
+//             className={`w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+//               error ? "border border-red-400" : "border border-gray-200"
 //             }`}
 //             required
 //           />
-//           {/* Suggestions Dropdown */}
 //           {showSuggestions && filteredTenants.length > 0 && (
-//             <ul className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-40 overflow-y-auto">
+//             <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-40 overflow-y-auto">
 //               {filteredTenants.map((t, index) => (
 //                 <li
 //                   key={t.id}
@@ -129,7 +152,7 @@
 //                   }}
 //                   className={`px-3 py-2 cursor-pointer text-sm ${
 //                     index === highlightIndex
-//                       ? "bg-blue-100"
+//                       ? "bg-blue-100 text-blue-700"
 //                       : "hover:bg-blue-50"
 //                   }`}
 //                 >
@@ -138,14 +161,12 @@
 //               ))}
 //             </ul>
 //           )}
-//           {/* Inline Error */}
 //           {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
 //         </div>
 
-
 //         {/* Case Name */}
 //         <div>
-//           <label className="block text-xs font-medium text-gray-600 mb-1">
+//           <label className="block text-xs font-medium text-gray-500 mb-1">
 //             Case Name
 //           </label>
 //           <input
@@ -153,13 +174,14 @@
 //             value={caseName}
 //             onChange={(e) => setCaseName(e.target.value)}
 //             placeholder="Enter case name"
-//             className="w-full px-3 py-2 border rounded-lg text-sm focus:ring focus:ring-blue-200"
+//             className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
 //             required
 //           />
 //         </div>
 
+//         {/* Case Type */}
 //         <div>
-//           <label className="block text-xs font-medium text-gray-600 mb-1">
+//           <label className="block text-xs font-medium text-gray-500 mb-1">
 //             Case Type
 //           </label>
 //           <input
@@ -167,46 +189,56 @@
 //             value={caseType}
 //             onChange={(e) => setCaseType(e.target.value)}
 //             placeholder="Enter case type"
-//             className="w-full px-3 py-2 border rounded-lg text-sm focus:ring focus:ring-blue-200"
+//             className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
 //             required
 //           />
 //         </div>
 
-//         {/* File Upload */}
+//         {/* File Upload (multiple) */}
 //         <div>
-//           <label className="block text-xs font-medium text-gray-600 mb-1">
-//             Attach File (optional)
+//           <label className="block text-xs font-medium text-gray-500 mb-1">
+//             Attach Files (optional)
 //           </label>
-        
-//           {/* Hidden file input */}
 //           <input
 //             type="file"
 //             id="file-upload"
 //             className="hidden"
-//             onChange={(e) => setFile(e.target.files[0])}
+//             multiple
+//             onChange={handleFileChange}
 //           />
-        
-//           {/* Styled button */}
 //           <label
 //             htmlFor="file-upload"
-//             className="inline-block cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition"
+//             className="inline-block cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition"
 //           >
-//             Choose File
+//             Choose Files
 //           </label>
-        
+
 //           {/* File preview */}
-//           {file && (
-//             <div className="mt-2 flex items-center space-x-2 text-sm text-gray-600">
-//               <span className="text-gray-500">📎</span>
-//               <span>{file.name}</span>
-//             </div>
+//           {files.length > 0 && (
+//             <ul className="mt-3 space-y-1 text-sm text-gray-700">
+//               {files.map((f, i) => (
+//                 <li
+//                   key={i}
+//                   className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg border border-gray-100"
+//                 >
+//                   <span className="truncate w-3/4">{f.name}</span>
+//                   <button
+//                     type="button"
+//                     onClick={() => removeFile(i)}
+//                     className="text-red-500 hover:text-red-700 text-xs font-medium"
+//                   >
+//                     Remove
+//                   </button>
+//                 </li>
+//               ))}
+//             </ul>
 //           )}
 //         </div>
 
-//         {/* Submit Button */}
+//         {/* Submit */}
 //         <button
 //           type="submit"
-//           className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"
+//           className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"
 //         >
 //           Submit Case
 //         </button>
@@ -215,20 +247,21 @@
 //   );
 // }
 
-"use client";
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createCaseWithAI } from "@/app/service/createService";
 
 export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
   const [tenantName, setTenantName] = useState("");
   const [caseName, setCaseName] = useState("");
   const [caseType, setCaseType] = useState("");
-  const [files, setFiles] = useState([]); // ✅ now supports multiple files
+  const [files, setFiles] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [error, setError] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ Ref to manually clear file input value
+  const fileInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -238,9 +271,10 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
         tenantID,
         caseName,
         caseType,
-        files, // ✅ pass as array
+        files,
       });
-      console.log(data)
+
+      console.log(data);
 
       if (data.success) {
         const mergedData = {
@@ -248,9 +282,15 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
           result: { ...data.result, case_name: caseName },
         };
         onSubmit?.(mergedData);
+
+        // ✅ Reset all fields
         setCaseName("");
+        setCaseType("");
         setFiles([]);
-      } else alert("Case creation failed");
+        if (fileInputRef.current) fileInputRef.current.value = ""; // important
+      } else {
+        alert("Case creation failed");
+      }
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
@@ -265,16 +305,21 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
 
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files);
-    setFiles(selected);
+    setFiles(selected); // Replace files on each upload
   };
 
   const removeFile = (index) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
+
+    // ✅ Also clear input if no files remain
+    if (fileInputRef.current && files.length <= 1) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
     <div className="relative bg-white p-6 rounded-2xl shadow-md transition-all duration-300 hover:shadow-lg">
-      {/* Loading Overlay */}
+      {/* ✅ Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-2xl">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
@@ -283,17 +328,16 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
       )}
 
       {/* Header */}
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        Create Case
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">Create Case</h3>
 
+      {/* Form */}
       <form
         onSubmit={handleSubmit}
         className={`space-y-4 transition duration-200 ${
           isLoading ? "opacity-50 pointer-events-none" : "opacity-100"
         }`}
       >
-        {/* Tenant Autocomplete (unchanged) */}
+        {/* Tenant Autocomplete */}
         <div className="relative">
           <label className="block text-xs font-medium text-gray-500 mb-1">
             Tenant
@@ -402,12 +446,13 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
           />
         </div>
 
-        {/* File Upload (multiple) */}
+        {/* File Upload (Multiple) */}
         <div>
           <label className="block text-xs font-medium text-gray-500 mb-1">
             Attach Files (optional)
           </label>
           <input
+            ref={fileInputRef}
             type="file"
             id="file-upload"
             className="hidden"
@@ -421,7 +466,7 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
             Choose Files
           </label>
 
-          {/* File preview */}
+          {/* File List */}
           {files.length > 0 && (
             <ul className="mt-3 space-y-1 text-sm text-gray-700">
               {files.map((f, i) => (
@@ -443,7 +488,7 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
           )}
         </div>
 
-        {/* Submit */}
+        {/* Submit Button */}
         <button
           type="submit"
           className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition"

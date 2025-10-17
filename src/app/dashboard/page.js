@@ -95,7 +95,7 @@ export default function DashboardPage() {
     fetchTenantCases()
   }, [tenantID])
 
-  console.log(mockCases)
+  // console.log(mockCases)
 
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
@@ -141,6 +141,7 @@ export default function DashboardPage() {
 
     const data = await getCaseAnalysis(tenantID, caseData.id);
     if (data.success) {
+      // console.log(data)
       setAnalysisData(data.result);
     } else {
       console.error("Failed to fetch case analysis:", data.error);

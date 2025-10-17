@@ -18,7 +18,7 @@ export default function CaseAnalysisModal({ isOpen, onClose, data }) {
   };
 
   const rulesList = data.rule_used
-    ? data.rule_used.split("#").map((rule) => rule.trim())
+    ? data.rule_used.split("|").map((rule) => rule.trim())
     : [];
 
   // Detect click outside the modal
