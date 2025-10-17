@@ -19,3 +19,16 @@ export async function getTenantCases(tenantID) {
         return { success: false, error: error.message };
     }
 }
+
+export async function getCaseAnalysis(tenantID, caseID) {
+  try {
+    const response = await fetch(`/api/case/latestresponse/${tenantID}/${caseID}`, {
+      method: "GET",
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching case analysis:", error);
+    return { success: false, error: error.message };
+  }
+}

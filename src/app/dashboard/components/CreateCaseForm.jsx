@@ -240,6 +240,7 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
         caseType,
         files, // ✅ pass as array
       });
+      console.log(data)
 
       if (data.success) {
         const mergedData = {

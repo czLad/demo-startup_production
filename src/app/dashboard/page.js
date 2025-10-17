@@ -9,7 +9,7 @@ import CaseDetailsModal from "./components/CaseDetailsModal";
 import CreateCaseForm from "./components/CreateCaseForm";
 import AICaseAssistant from "./components/AICaseAssistant";
 import CaseAnalysisModal from "./components/CaseAnalysisModal";
-import { getAllTenants, getTenantCases } from "../service/fetchService";
+import { getAllTenants, getTenantCases, getCaseAnalysis } from "../service/fetchService";
 
 export default function DashboardPage() {
   const [selectedCase, setSelectedCase] = useState(null);
@@ -95,7 +95,7 @@ export default function DashboardPage() {
     fetchTenantCases()
   }, [tenantID])
 
-  // console.log(mockCases)
+  console.log(mockCases)
 
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
@@ -118,8 +118,8 @@ export default function DashboardPage() {
         name: data.result.case_name || "Untitled Case",   // map backend `case_name` -> `name`
         description: data.result.short_des,          // "Minor damages reported",              // backend doesn’t give one yet
         status: "Case Created",                      // default/fallback since backend doesn’t send status
-        createdAt: data.result.created_at,
-        updatedAt: data.result.updated_at,
+        createdAt: now,
+        updatedAt: now,
       },
     ]);
   };
@@ -134,9 +134,26 @@ export default function DashboardPage() {
   "rule_used": "Chubb Travel Insurance Policy—Trip Interruption/Trip Delay: Duties After Loss (proof of loss, receipts, carrier delay confirmation)#California Fair Claims Settlement Practices Regulations, 10 CCR §2695.7#NAIC Unfair Claims Settlement Practices Model Act (claims documentation and investigation standards)#Regulation (EC) No 261/2004 (EU261) (air passenger delay compensation; potential third-party recovery)"
   }
 
-  const handleCaseClick = (caseData) => {
-    setAnalysisData(exampleResponse); // replace with selected case’s AI result
+  const handleCaseClick = async (caseData) => {
+    // Next stop: show temporary loading state in modal
     setSelectedCaseAI(caseData.id);
+    setAnalysisData(null);
+
+    const data = await getCaseAnalysis(tenantID, caseData.id);
+    if (data.success) {
+      setAnalysisData(data.result);
+    } else {
+      console.error("Failed to fetch case analysis:", data.error);
+      setAnalysisData({
+        short_des: "Unable to load analysis.",
+        reasoning: res.error,
+        confidence: 0,
+        riskScore: "N/A",
+        flags: [],
+        rule_used: "",
+        rule_followed: false,
+      });
+    }
   };
 
 
