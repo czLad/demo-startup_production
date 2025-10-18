@@ -90,7 +90,6 @@
 //             Tenant
 //           </label>
 //           <input
-//             ref={fileInputRef}
 //             type="text"
 //             value={tenantName}
 //             onChange={(e) => {
@@ -200,6 +199,7 @@
 //             Attach Files (optional)
 //           </label>
 //           <input
+              // ref={fileInputRef}
 //             type="file"
 //             id="file-upload"
 //             className="hidden"
@@ -255,13 +255,27 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
   const [caseName, setCaseName] = useState("");
   const [caseType, setCaseType] = useState("");
   const [files, setFiles] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showTenantSuggestions, setShowTenantSuggestions] = useState(false);
+  const [showCaseTypeSuggestions, setShowCaseTypeSuggestions] = useState(false);
   const [error, setError] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
 
   // ✅ Ref to manually clear file input value
   const fileInputRef = useRef(null);
+  const insuranceTypes = [
+    "Auto Insurance",
+    "Travelers Insurance",
+    "P&C",
+    "Liability",
+    "Worker’s Compensation",
+    "Cyber",
+    "Financial Insurance",
+  ];
+
+  const filteredTypes = insuranceTypes.filter((type) =>
+    type.toLowerCase().includes(caseType.toLowerCase())
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -347,7 +361,7 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
             value={tenantName}
             onChange={(e) => {
               setTenantName(e.target.value);
-              setShowSuggestions(true);
+              setShowTenantSuggestions(true);
               setError("");
               setHighlightIndex(-1);
             }}
@@ -367,12 +381,12 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
               if (e.key === "Enter" && highlightIndex >= 0) {
                 e.preventDefault();
                 setTenantName(filteredTenants[highlightIndex].name);
-                setShowSuggestions(false);
+                setShowTenantSuggestions(false);
                 setError("");
               }
             }}
             onBlur={() => {
-              setTimeout(() => setShowSuggestions(false), 100);
+              setTimeout(() => setShowTenantSuggestions(false), 100);
               if (tenantName) {
                 const match = tenants.find(
                   (t) => t.name.toLowerCase() === tenantName.toLowerCase()
@@ -385,21 +399,21 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
                 }
               }
             }}
-            onFocus={() => setShowSuggestions(true)}
+            onFocus={() => setShowTenantSuggestions(true)}
             placeholder="Start typing tenant name"
             className={`w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 ${
               error ? "border border-red-400" : "border border-gray-200"
             }`}
             required
           />
-          {showSuggestions && filteredTenants.length > 0 && (
+          {showTenantSuggestions && filteredTenants.length > 0 && (
             <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-40 overflow-y-auto">
               {filteredTenants.map((t, index) => (
                 <li
                   key={t.id}
                   onMouseDown={() => {
                     setTenantName(t.name);
-                    setShowSuggestions(false);
+                    setShowTenantSuggestions(false);
                     setError("");
                   }}
                   className={`px-3 py-2 cursor-pointer text-sm ${
@@ -431,19 +445,67 @@ export default function CreateCaseForm({ onSubmit, tenants, tenantID }) {
           />
         </div>
 
-        {/* Case Type */}
-        <div>
+        {/* Case Type Autocomplete */}
+        <div className="relative">
           <label className="block text-xs font-medium text-gray-500 mb-1">
             Case Type
           </label>
+
           <input
             type="text"
             value={caseType}
-            onChange={(e) => setCaseType(e.target.value)}
-            placeholder="Enter case type"
+            onChange={(e) => {
+              setCaseType(e.target.value);
+              setShowCaseTypeSuggestions(true);
+              setHighlightIndex(-1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setHighlightIndex((prev) =>
+                  prev < filteredTypes.length - 1 ? prev + 1 : 0
+                );
+              }
+              if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setHighlightIndex((prev) =>
+                  prev > 0 ? prev - 1 : filteredTypes.length - 1
+                );
+              }
+              if (e.key === "Enter" && highlightIndex >= 0) {
+                e.preventDefault();
+                setCaseType(filteredTypes[highlightIndex]);
+                setShowCaseTypeSuggestions(false);
+              }
+            }}
+            onBlur={() => setTimeout(() => setShowCaseTypeSuggestions(false), 100)}
+            onFocus={() => setShowCaseTypeSuggestions(true)}
+            placeholder="Select insurance type"
             className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
             required
           />
+
+          {/* Suggestions Dropdown */}
+          {showCaseTypeSuggestions && filteredTypes.length > 0 && (
+            <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-md max-h-40 overflow-y-auto">
+              {filteredTypes.map((type, index) => (
+                <li
+                  key={type}
+                  onMouseDown={() => {
+                    setCaseType(type);
+                    setShowCaseTypeSuggestions(false);
+                  }}
+                  className={`px-3 py-2 cursor-pointer text-sm ${
+                    index === highlightIndex
+                      ? "bg-blue-100 text-blue-700"
+                      : "hover:bg-blue-50"
+                  }`}
+                >
+                  {type}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* File Upload (Multiple) */}
