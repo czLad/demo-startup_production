@@ -139,23 +139,32 @@ export default function AICaseAssistant({
       </div>
 
       {/* Scrollable Case Grid */}
+      {isLoadingCases ? (
+      <div className="p-4 max-h-[490px]">
+        <div className="inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+          <p className="text-sm font-medium text-gray-600">
+            Loading Cases...
+          </p>
+        </div>
+      </div>
+      ): (
       <div className="p-4 max-h-[490px] overflow-y-auto">
-        {isLoadingCases && (
-          <div className="absolute inset-0 bg-white/70 backdrop-blur-sm flex flex-col items-center justify-center z-10">
-            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-            <p className="text-sm font-medium text-gray-600">
-              Loading Cases...
-            </p>
-          </div>
-        )}
 
         {/* Case grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {cases.map((c) => (
+          {cases.map((c) => {
+          const isDisabled = c.status === "Case Created"; // disable opening modal
+
+          return (
             <div
               key={c.id}
-              onClick={() => onCaseClick && onCaseClick(c)}
-              className="group bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col space-y-3 transition-all duration-300 hover:shadow-md hover:-translate-y-[1px] cursor-pointer"
+              onClick={() => {
+                if (!isDisabled && onCaseClick) onCaseClick(c);
+              }}
+              className={`group rounded-xl border border-gray-100 p-4 flex flex-col space-y-3
+                transition-all duration-300 bg-white hover:shadow-md cursor-pointer
+                ${!isDisabled ? "hover:-translate-y-[4px]" : ""}`}
             >
               {/* Select + Status */}
               <div className="flex items-center justify-between">
@@ -189,19 +198,18 @@ export default function AICaseAssistant({
                   </span>
                 )}
               </div>
-
+              
               {/* Case Info */}
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-gray-800 mb-1 group-hover:text-blue-600 transition">
+                <h3 className={`text-sm font-semibold mb-1 text-gray-800
+                  ${isDisabled? "" : "group-hover:text-blue-600 transition"}`}>
                   {c.name}
                 </h3>
                 {c.description && (
-                  <p className="text-xs text-gray-500 leading-snug">
-                    {c.description}
-                  </p>
+                  <p className="text-xs text-gray-500 leading-snug">{c.description}</p>
                 )}
               </div>
-
+              
               {/* Actions */}
               <div
                 className="flex items-center gap-3 pt-1"
@@ -222,7 +230,7 @@ export default function AICaseAssistant({
                 </button>
               </div>
             </div>
-          ))}
+          );})}
 
           {!isLoadingCases && cases.length === 0 && (
             <div className="col-span-full text-center text-sm text-gray-400 py-8">
@@ -230,7 +238,7 @@ export default function AICaseAssistant({
             </div>
           )}
         </div>
-      </div>
+      </div>)}
     </div>
   );
 }

@@ -95,7 +95,7 @@ export default function DashboardPage() {
     fetchTenantCases()
   }, [tenantID])
 
-  // console.log(mockCases)
+  console.log(mockCases)
 
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
@@ -117,7 +117,7 @@ export default function DashboardPage() {
         id: data.new_case_id,
         name: data.result.case_name || "Untitled Case",   // map backend `case_name` -> `name`
         description: data.result.short_des,          // "Minor damages reported",              // backend doesn’t give one yet
-        status: "Case Created",                      // default/fallback since backend doesn’t send status
+        status: "Case Created",    //should be boolean new_case_processed later     // default/fallback since backend doesn’t send status
         createdAt: now,
         updatedAt: now,
       },
@@ -193,7 +193,7 @@ export default function DashboardPage() {
 
         {/* Row 3: Cases Table */}
         <div>
-          <CasesTable cases={mockCases} onCaseClick={setSelectedCase} />
+          <CasesTable cases={mockCases} onCaseClick={setSelectedCase} isLoadingCases={isLoadingTenantCases}/>
         </div>
 
         {/* Row 4: Create New Case Form */}
