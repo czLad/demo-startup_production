@@ -29,7 +29,7 @@ export default function DashboardPage() {
   useEffect( () => {
     const fetchTenants = async () => {
       const data = await getAllTenants();
-      console.log(data)
+      // console.log(data)
       if(data.success) {
         setTenants(data.result);
         setTenantMap(
@@ -43,7 +43,7 @@ export default function DashboardPage() {
     fetchTenants();
   }, []);
 
-  console.log(tenantMap)
+  // console.log(tenantMap)
   // console.log("Rendering tenants:", tenants);
 
   // console.log("Rendering tenantmaps:", tenantMap);
@@ -80,7 +80,7 @@ export default function DashboardPage() {
     fetchTenantCases()
   }, [tenantID])
 
-  console.log(mockCases)
+  // console.log(mockCases)
 
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
