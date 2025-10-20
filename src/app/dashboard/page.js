@@ -44,7 +44,7 @@ export default function DashboardPage() {
   }, []);
 
   // console.log(tenantMap)
-  // console.log(tenantMap)
+  
   //Hardcoded for now -> To be soft coded with login implemented
   const tenantID = tenantMap["alliant"]
 
