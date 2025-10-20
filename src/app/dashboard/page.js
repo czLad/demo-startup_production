@@ -19,21 +19,6 @@ export default function DashboardPage() {
       { id: "C-101", name: "Auto Claim - Tesla", createdAt: "2025-09-01", updatedAt: "2025-09-03" },
       { id: "C-102", name: "Home Insurance - Fire", createdAt: "2025-09-05", updatedAt: "2025-09-06" },
     ]);
-
-  // const [mockCases, setMockCases] = useState([
-  // {
-  //   id: "CA-201",
-  //   name: "Travel Insurance Claim - Missed Connection at JFK",
-  //   description: "Flight missed due to delay",
-  //   status: "Pending",
-  // },
-  // {
-  //   id: "CA-202",
-  //   name: "Auto Collision Claim - Rear-End at Mission Bay",
-  //   description: "Minor damages reported",
-  //   status: "Approved",
-  // },
-  // ]);
   const [mockCases, setMockCases] = useState([]);
 
   const [tenants, setTenants] = useState([]);
@@ -44,7 +29,7 @@ export default function DashboardPage() {
   useEffect( () => {
     const fetchTenants = async () => {
       const data = await getAllTenants();
-      // console.log(data)
+      console.log(data)
       if(data.success) {
         setTenants(data.result);
         setTenantMap(
@@ -58,7 +43,7 @@ export default function DashboardPage() {
     fetchTenants();
   }, []);
 
-
+  console.log(tenantMap)
   // console.log("Rendering tenants:", tenants);
 
   // console.log("Rendering tenantmaps:", tenantMap);

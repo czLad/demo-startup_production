@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "upload-video": "node scripts/upload-video.js"
+    "upload-video": "node scripts/upload-video.js",
+    "test": "jest"
   },
   "dependencies": {
     "@vercel/blob": "^1.1.1",
@@ -25,8 +26,12 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "tailwindcss": "^4"
   }
 }
