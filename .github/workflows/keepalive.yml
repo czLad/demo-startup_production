@@ -1,0 +1,15 @@
+name: Keep Vercel API Warm
+
+on:
+  schedule:
+    # Runs every 10 minutes
+    - cron: "*/10 * * * *"
+  workflow_dispatch: # allows you to run manually from the GitHub Actions tab
+
+jobs:
+  ping-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping your API endpoint
+        run: |
+          curl -s -o /dev/null -w "%{http_code}\n" https://testkoametrics.org/api/health
