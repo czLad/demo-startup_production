@@ -12,4 +12,7 @@ jobs:
     steps:
       - name: Ping your API endpoint
         run: |
+          echo "Pinging API health..."
           curl -s -o /dev/null -w "%{http_code}\n" https://www.testkoametrics.org/api/health
+          echo "Pinging case route..."
+          curl -s -o /dev/null -w "%{http_code}\n" https://www.testkoametrics.org/api/case
