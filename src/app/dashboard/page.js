@@ -55,6 +55,7 @@ export default function DashboardPage() {
       setIsLoadingTenantCases(true)
       try {
       const data = await getTenantCases(tenantID);
+      console.log(data)
       if (data.success) {
         const normalized = data.result.map((c) => ({
           id: c.id,
