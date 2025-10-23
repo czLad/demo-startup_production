@@ -1,18 +1,31 @@
-name: Keep Vercel API Warm
+name: Keep Vercel + Render API Warm
 
 on:
   schedule:
-    # Runs every 10 minutes
+    # Every 10 minutes
     - cron: "*/10 * * * *"
-  workflow_dispatch: # allows you to run manually from the GitHub Actions tab
+  workflow_dispatch: # manual run option
 
 jobs:
-  ping-vercel:
+  keep-warm:
     runs-on: ubuntu-latest
+    env:
+      TENANT_ID: ${{ secrets.TENANT_ID }} # Securely injected from GitHub Secrets
+
     steps:
-      - name: Ping your API endpoint
+      - name: Ping Vercel API health route
         run: |
-          echo "Pinging API health..."
-          curl -s -o /dev/null -w "%{http_code}\n" https://www.testkoametrics.org/api/health
-          echo "Pinging case route..."
-          curl -s -o /dev/null -w "%{http_code}\n" https://www.testkoametrics.org/api/case
+          echo "Pinging Vercel API health..."
+          STATUS=$(curl -s -L -o /dev/null -w "%{http_code}\n" https://www.testkoametrics.org/api/health)
+          echo "Health endpoint returned: $STATUS"
+
+      - name: Wait before backend ping
+        run: |
+          echo "Waiting 5 seconds before hitting Render backend..."
+          sleep 5
+
+      - name: Ping case route to keep Render backend awake
+        run: |
+          echo "Pinging /api/case/${TENANT_ID} (GET)..."
+          STATUS=$(curl -s -L -o /dev/null -w "%{http_code}\n" "https://www.testkoametrics.org/api/case/${TENANT_ID}")
+          echo "Case route returned: $STATUS"
