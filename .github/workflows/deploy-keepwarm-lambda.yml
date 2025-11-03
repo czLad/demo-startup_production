@@ -34,6 +34,9 @@ jobs:
           aws lambda update-function-code \
             --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}" \
             --zip-file fileb://infra/function.zip
+      
+      - name: Wait for Lambda code update to finish
+        run: sleep 15
 
       - name: Update Lambda env
         run: |
