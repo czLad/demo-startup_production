@@ -35,14 +35,13 @@ jobs:
             --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}" \
             --zip-file fileb://infra/function.zip
 
-      # Optional: keep Lambda env vars in GitHub Secrets and update here
-      - name: Update Lambda env (optional)
-        if: ${{ secrets.TENANT_ID != '' || secrets.KEEPWARM_ENDPOINTS != '' }}
+      - name: Update Lambda env
         run: |
           aws lambda update-function-configuration \
             --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}" \
             --environment "Variables={TENANT_ID=${{ secrets.TENANT_ID }},ENDPOINTS='${{ secrets.KEEPWARM_ENDPOINTS }}',REQUEST_TIMEOUT_MS=8000}"
 
-      - name: Publish new version (optional)
+
+      - name: Publish new version
         run: |
           aws lambda publish-version --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}"
