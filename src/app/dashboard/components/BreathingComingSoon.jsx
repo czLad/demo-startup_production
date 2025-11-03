@@ -18,7 +18,6 @@ export default function BreathingComingSoon({
           width={200}
           height={200}
           priority
-        //   className="transition-all drop-shadow-[0_0_30px_rgba(37,99,235,0.35)]"
           className="transition-all"
         />
       </motion.div>
