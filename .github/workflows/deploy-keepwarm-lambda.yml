@@ -44,6 +44,9 @@ jobs:
             --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}" \
             --environment "Variables={TENANT_ID=${{ secrets.TENANT_ID }},ENDPOINTS='${{ secrets.KEEPWARM_ENDPOINTS }}',REQUEST_TIMEOUT_MS=8000}"
 
+      - name: Wait for Lambda code update to finish
+        run: sleep 15
+
       - name: Publish new version
         run: |
           aws lambda publish-version --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}"
