@@ -22,7 +22,7 @@ export default function UnderwritingPage() {
   }, []);
 
   return (
-    <DashboardLayout title="Employee Network">
+    <DashboardLayout title="Underwriting">
       <div
         className="relative flex items-center justify-center rounded-2xl overflow-hidden bg-white shadow-sm p-6 transition-all"
         style={{ height: contentHeight }}
