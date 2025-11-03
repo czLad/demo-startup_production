@@ -30,8 +30,8 @@ const IconUnderwriting = (props) => (
 const NAV = [
   { href: "/dashboard", label: "Dashboard", Icon: IconDashboard },
   { href: "/insights", label: "Insights", Icon: IconData },
-  { href: "/dashboard/employee-network", label: "Employee Network", Icon: IconNetwork },
-  { href: "/dashboard/underwriting", label: "Underwriting", Icon: IconUnderwriting },
+  { href: "/employee-network", label: "Employee Network", Icon: IconNetwork },
+  { href: "/underwriting", label: "Underwriting", Icon: IconUnderwriting },
 ];
 
 export default function SidebarNav() {
