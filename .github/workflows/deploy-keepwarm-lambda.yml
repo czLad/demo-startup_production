@@ -2,7 +2,7 @@ name: Deploy KeepWarm Lambda
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dashboard ]
     paths:
       - 'infra/lambda/keepWarm/**'
       - '.github/workflows/deploy-keepwarm-lambda.yml'
@@ -40,7 +40,6 @@ jobs:
           aws lambda update-function-configuration \
             --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}" \
             --environment "Variables={TENANT_ID=${{ secrets.TENANT_ID }},ENDPOINTS='${{ secrets.KEEPWARM_ENDPOINTS }}',REQUEST_TIMEOUT_MS=8000}"
-
 
       - name: Publish new version
         run: |
