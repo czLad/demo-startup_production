@@ -1,37 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import DashboardLayout from "../dashboard/components/DashboardLayout";
-import BreathingComingSoon from "../dashboard/components/BreathingComingSoon";
+import { useState, useMemo } from "react";
+import EmployeesTable from "./components/EmployeesTable";
+import SearchBar from "./components/SearchBar";
+import { employees as allEmployees } from "./data/mockEmployees";
 
 export default function EmployeeNetworkPage() {
-  const [contentHeight, setContentHeight] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    // Adjust height dynamically to fit available viewport space
-    const updateHeight = () => {
-      const header = document.querySelector("header");
-      const headerHeight = header ? header.offsetHeight : 0;
-      const availableHeight = window.innerHeight - headerHeight - 48; // 48px = desired padding/margin
-      setContentHeight(`${availableHeight}px`);
-    };
-
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
-  }, []);
+  // Real-time search filtering
+  const filteredEmployees = useMemo(() => {
+    const q = searchTerm.toLowerCase().trim();
+    if (!q) return allEmployees;
+    return allEmployees.filter(
+      (e) =>
+        e.name.toLowerCase().includes(q)
+    );
+  }, [searchTerm]);
 
   return (
-    <DashboardLayout title="Employee Network">
-      <div
-        className="relative flex items-center justify-center rounded-2xl overflow-hidden bg-white shadow-sm p-6 transition-all"
-        style={{ height: contentHeight }}
-      >
-        {/* Foreground breathing content */}
-        <div className="relative z-10">
-          <BreathingComingSoon />
-        </div>
-      </div>
-    </DashboardLayout>
+    <div className="flex flex-col gap-6">
+      {/* Search Bar */}
+      <SearchBar value={searchTerm} onChange={setSearchTerm} />
+      {/* Employees Table */}
+      <EmployeesTable employees={filteredEmployees} />
+    </div>
   );
 }

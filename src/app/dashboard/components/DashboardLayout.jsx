@@ -3,7 +3,7 @@
 
 import SidebarNav from "./SidebarNav";
 
-export default function DashboardLayout({ title = "Dashboard", children }) {
+export default function DashboardLayout({ title = "Dashboard", greeting = "Hello, Employee", children }) {
   return (
     <div className="flex min-h-screen bg-gray-50 text-gray-900">
       {/* Sidebar */}
@@ -21,7 +21,7 @@ export default function DashboardLayout({ title = "Dashboard", children }) {
           <h1 className="text-lg font-semibold tracking-wide">{title}</h1>
           <div className="flex items-center gap-4">
             {/* placeholder for user avatar or settings later */}
-            <span className="text-sm text-gray-500">Hello, Employee</span>
+            <span className="text-sm text-gray-500">{greeting}</span>
             <div className="w-8 h-8 rounded-full bg-gray-300"></div>
           </div>
         </header>

@@ -47,8 +47,8 @@ export default function CasesTable({ cases, onCaseClick, isLoadingCases }) {
         <table className="w-full text-sm text-left border-collapse">
           <thead className="bg-gray-50/70 text-gray-600 uppercase text-xs tracking-wider">
             <tr>
-              <th className="px-5 py-3 font-medium w-[25%]">Case ID</th>
-              <th className="px-5 py-3 font-medium w-[35%]">Case Name</th>
+              <th className="px-5 py-3 font-medium w-[24.5%]">Case ID</th>
+              <th className="px-5 py-3 font-medium w-[34%]">Case Name</th>
               <th className="px-5 py-3 font-medium w-[20%]">Created</th>
               <th className="px-5 py-3 font-medium w-[20%]">Updated</th>
             </tr>
