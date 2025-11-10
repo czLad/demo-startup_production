@@ -1,8 +1,8 @@
-name: Deploy KeepWarm Lambda
+name: Deploy KeepWarm Lambda (Production)
 
 on:
   push:
-    branches: [ dashboard ]
+    branches: [ main ]
     paths:
       - 'infra/lambda/keepWarm/**'
       - '.github/workflows/deploy-keepwarm-lambda.yml'
@@ -11,6 +11,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout
@@ -34,17 +35,17 @@ jobs:
           aws lambda update-function-code \
             --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}" \
             --zip-file fileb://infra/function.zip
-      
+
       - name: Wait for Lambda code update to finish
         run: sleep 15
 
-      - name: Update Lambda env
+      - name: Update Lambda environment variables
         run: |
           aws lambda update-function-configuration \
             --function-name "${{ secrets.LAMBDA_FUNCTION_NAME }}" \
             --environment "Variables={TENANT_ID=${{ secrets.TENANT_ID }},ENDPOINTS='${{ secrets.KEEPWARM_ENDPOINTS }}',REQUEST_TIMEOUT_MS=8000}"
 
-      - name: Wait for Lambda code update to finish
+      - name: Wait for configuration to apply
         run: sleep 15
 
       - name: Publish new version

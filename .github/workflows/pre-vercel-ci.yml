@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ dashboard ]
   push:
-    branches: [ dashboard ]
+    branches: [ dashboard, main ]
 
 jobs:
   lint-test:
@@ -39,8 +39,12 @@ jobs:
     name: Notify Vercel of Deployment
     needs: lint-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dashboard' && success()
+    # ✅ Automatically selects environment based on branch
+    environment: ${{ github.ref_name == 'main' && 'production' || 'test' }}
+    if: success()
+
     steps:
       - name: Trigger Vercel Deployment
         run: |
+          echo "Deploying branch: ${{ github.ref_name }}"
           curl -X POST "https://api.vercel.com/v1/integrations/deploy/${{ secrets.VERCEL_PROJECT_ID }}/${{ secrets.VERCEL_PROJECT_DEPLOY_TOKEN }}"
