@@ -34,9 +34,9 @@ export async function createCaseWithAI({ tenantID, caseName, caseType, files }) 
       files.forEach((file) => formData.append("files", file));
     }
 
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(key, value);
+    // }
 
     const response = await fetch("/api/cases/new", {
       method: "POST",

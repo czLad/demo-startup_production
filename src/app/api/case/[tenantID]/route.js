@@ -1,7 +1,7 @@
 export async function GET( request, { params } ) {
   try {
     const { tenantID } = await params;
-    const response = await fetch(`${process.env.BASE_URL}/api/v3/case/${tenantID}`, {
+    const response = await fetch(`${process.env.BASE_URL}/api/v3/case/?tenant_id=${tenantID}`, {
       method : "GET",
       headers: {
         'Content-Type' : 'application/json',
@@ -27,7 +27,7 @@ export async function DELETE(request, { params }) {
     const { caseID } = await request.json();
 
     const response = await fetch(
-      `${process.env.BASE_URL}/api/v3/case/${tenantID}/${caseID}`,
+      `${process.env.BASE_URL}/api/v2/case/${tenantID}/${caseID}`,
       {
         method: "DELETE",
         headers: {
