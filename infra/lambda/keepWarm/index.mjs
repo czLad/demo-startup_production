@@ -1,7 +1,7 @@
-// Node.js 20+ Lambda — pings one or more endpoints with retries and a delay.
+// Node.js 20+ Lambda — pings one or more endpoints with retries and delay.
 // Env vars:
 //  - TENANT_ID: e.g. "abc123"
-//  - ENDPOINTS: comma-separated URLs. You can use {TENANT_ID} in any URL.
+//  - ENDPOINTS: comma-separated URLs. Use {TENANT_ID} placeholder.
 //  - REQUEST_TIMEOUT_MS: e.g. "8000"
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -13,12 +13,16 @@ async function ping(url, timeoutMs) {
   try {
     const res = await fetch(url, {
       method: "GET",
-      redirect: "manual",
+      redirect: "follow",
       signal: controller.signal,
-      headers: { "User-Agent": "SynsureKeepWarm/1.0" }
+      headers: {
+        "User-Agent": "SynsureKeepWarm/1.0",
+        Accept: "application/json",
+      },
     });
-    const ok = res.ok ? "OK" : `HTTP_${res.status}`;
-    console.log(`[PING] ${ok} ${url}`);
+
+    const statusMsg = res.ok ? "OK" : `HTTP_${res.status}`;
+    console.log(`[PING] ${statusMsg} ${url}`);
     return res.ok;
   } catch (e) {
     console.warn(`[PING] ERROR ${url} :: ${e.name} ${e.message}`);
@@ -32,6 +36,7 @@ async function pingWithRetry(url, timeoutMs, retries = 2) {
   for (let i = 0; i <= retries; i++) {
     const ok = await ping(url, timeoutMs);
     if (ok) return true;
+
     if (i < retries) {
       const backoff = 1000 * (i + 1);
       console.log(`[RETRY] ${url} in ${backoff}ms`);
@@ -45,7 +50,7 @@ export const handler = async () => {
   const tenantId = process.env.TENANT_ID ?? "";
   const timeoutMs = Number(process.env.REQUEST_TIMEOUT_MS ?? 8000);
 
-  // Example: "https://.../api/health, https://.../api/case/{TENANT_ID}"
+  // e.g. "https://.../api/health, https://.../api/case/{TENANT_ID}"
   const endpoints = (process.env.ENDPOINTS ?? "")
     .split(",")
     .map((s) => s.trim())
@@ -56,7 +61,6 @@ export const handler = async () => {
     throw new Error("ENDPOINTS env var is empty.");
   }
 
-  // Keep ordering compatible with your old YAML: health → wait 5s → case
   for (let i = 0; i < endpoints.length; i++) {
     await pingWithRetry(endpoints[i], timeoutMs, 2);
     if (i === 0 && endpoints.length > 1) {
@@ -65,5 +69,6 @@ export const handler = async () => {
     }
   }
 
+  console.log(`[DONE] Successfully pinged ${endpoints.length} endpoint(s).`);
   return { ok: true, count: endpoints.length };
 };
