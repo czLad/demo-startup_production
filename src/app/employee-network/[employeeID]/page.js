@@ -12,7 +12,6 @@ export default function EmployeeDetailsPage({ params }) {
   const router = useRouter();
   const { employeeID } = use(params);
   const employee = getEmployeeById(employeeID);
-  console.log(employee)
 
   if (!employee) {
     return (

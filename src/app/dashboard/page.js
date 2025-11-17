@@ -29,7 +29,6 @@ export default function DashboardPage() {
   useEffect( () => {
     const fetchTenants = async () => {
       const data = await getAllTenants();
-      // console.log(data)
       if(data.success) {
         setTenants(data.result);
         setTenantMap(
@@ -43,8 +42,6 @@ export default function DashboardPage() {
     fetchTenants();
   }, []);
 
-  // console.log(tenantMap)
-  // console.log(tenantMap)
   //Hardcoded for now -> To be soft coded with login implemented
   const tenantID = tenantMap["alliant"]
 
@@ -55,7 +52,6 @@ export default function DashboardPage() {
       setIsLoadingTenantCases(true)
       try {
       const data = await getTenantCases(tenantID);
-      // console.log(data)
       if (data.success) {
         const normalized = data.result.data.map((c) => ({
           id: c.id,
@@ -78,8 +74,6 @@ export default function DashboardPage() {
     fetchTenantCases()
   }, [tenantID])
 
-  // console.log(mockCases)
-
   const handleAddCase = (newCase) => {
     const newId = `C-${100 + cases.length + 1}`;
     const now = new Date().toISOString().split("T")[0];
@@ -90,7 +84,6 @@ export default function DashboardPage() {
   };
 
   const handleAddAICase = (data) => {
-    // console.log(data)
     if (!data.success) return;
     const now = new Date().toISOString().split("T")[0];
 
@@ -124,7 +117,6 @@ export default function DashboardPage() {
 
     const data = await getCaseAnalysis(tenantID, caseData.id);
     if (data.success) {
-      // console.log(data)
       setAnalysisData(data.result);
     } else {
       console.error("Failed to fetch case analysis:", data.error);
